@@ -2,8 +2,8 @@
 char newip[] ="192.168.0.26";
 //char newip[] ="10.0.1.100";
 //char newip[] ="162.217.250.109";
-char newdevid[] = "CYURD002";
-char newssid[] = "Uli Fence";
+char newdevid[] = "CYURD004";
+char newssid[] = "street_no_vale2";
 char newport[] = "8332";
 char newpwd[] = "jjjjjjjj";
 

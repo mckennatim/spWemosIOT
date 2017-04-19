@@ -14,8 +14,8 @@
 Sched sched;
 
 prgs_t prgs {
-    {0,255,1,2,{{0,0,76,73}}},
-    {1,255,1,2,{{0,0,74,69}}},
+    {0,255,1,2,{{0,0,82,81}}},
+    {1,255,1,2,{{0,0,83,82}}},
     {2,255,1,1,{{0,0,0}}},
     {3,255,1,1,{{0,0,0}}},
     {4,255,1,1,{{0,0,0}}}
@@ -26,10 +26,6 @@ ports_t po {5, 16, 15, 13, 12, 4, 14};
 labels_t la; //subsribedTo[], numcmds
 
 #define ONE_WIRE_BUS po.ds18b20 
-
-const char* mqtt_server = "sitebuilt.net";
-const int mport = 1883;
-//const char* mqtt_server = "10.0.1.100";
 
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature DS18B20(&oneWire);
@@ -46,13 +42,19 @@ void initShit(){
   pinMode(po.timr1, OUTPUT);
   pinMode(po.timr2, OUTPUT);
   pinMode(po.timr3, OUTPUT);
-  pinMode(po.io14d5, INPUT);
   digitalWrite(po.temp1, LOW);
   digitalWrite(po.temp2, LOW);
   digitalWrite(po.timr1, LOW);
   digitalWrite(po.timr2, LOW);
   digitalWrite(po.timr3, LOW);
-  digitalWrite(po.timr3, LOW);
+}
+
+void adjHeat(temp_t& te, bool& rs){
+  if (te.temp >= te.hilimit){
+    rs=0;
+  } else if (te.temp <= te.lolimit){
+    rs=1;
+  }  
 }
 
 void readTemps(){
@@ -60,20 +62,47 @@ void readTemps(){
   int temp1 = (int)DS18B20.getTempFByIndex(0);
   int temp2 = (int)DS18B20.getTempFByIndex(1);
   if(temp1 != sr.temp1.temp && temp1 <120 && temp1>-20){
-    sr.temp1.temp=temp1;
-    int id = 0;
-    int bit =pow(2,id);
+    int bit =pow(2,0);
     int mask = 31-bit;
-    sched.adjHeat(id, sr.temp1, po.temp1);
+    sr.temp1.temp=temp1;
+    bool relaystate;
+    adjHeat(sr.temp1, relaystate);
+    if (relaystate != sr.temp1.state){
+      sr.temp1.state = relaystate;
+      int relayon = f.ISrELAYoN;
+      if(sr.temp1.state){
+        relayon = relayon | bit;
+      }else{
+        relayon = relayon & mask;
+      }
+      if(relayon!=f.ISrELAYoN){
+        f.ISrELAYoN = relayon;
+        req.pubTimr();
+      }
+      digitalWrite(po.temp1, relaystate);
+    }
     f.HAYsTATEcNG=f.HAYsTATEcNG | bit;
   }
   if(temp2 != sr.temp2.temp && temp2 <120 && temp2>-20){
-    sr.temp2.temp=temp2;
-    int id = 1;
-    int bit =pow(2,id);
+    int bit =pow(2,1);
     int mask = 31-bit;
-    sched.adjHeat(id, sr.temp2, po.temp2);
-    f.HAYsTATEcNG=f.HAYsTATEcNG | bit;
+    sr.temp2.temp=temp2;
+    bool relaystate;
+    adjHeat(sr.temp2, relaystate);
+    if (relaystate != sr.temp2.state){
+      sr.temp2.state = relaystate;
+      int relayon = f.ISrELAYoN;
+      if(sr.temp1.state){
+        relayon = relayon | bit;
+      }else{
+        relayon = relayon & mask;
+      }
+      if(relayon!=f.ISrELAYoN){
+        f.ISrELAYoN = relayon;
+        req.pubTimr();      
+      }
+      digitalWrite(po.temp2, relaystate);
+    }
     f.HAYsTATEcNG=f.HAYsTATEcNG | bit;
   }
 }
@@ -87,11 +116,21 @@ void setup(){
   Serial.println("--------------------------");
   initShit();
   getOnline();//config.cpp
-  //client.setServer(ip, 1883);
-  client.setServer(mqtt_server, mport);
+  client.setServer(ip, 1883);
   client.setCallback(handleCallback); //in Req.cpp
-  //mq.reconn(client);   
-  //req.stime();
+  mq.reconn(client);   
+  req.stime();
+  //test payloads
+  // char ipayload1[250] = "{\"id\":0,\"pro\":[[0,0,84,68],[6,30,84,70],[8,15,58,56],[4,15,68,66],[11,33,56,54]]}";
+  // char ipayload2[250] = "{\"id\":1,\"pro\":[[0,0,64,58],[6,0,81,75]]}";
+  // char ipayload3[250] = "{\"id\":2,\"pro\":[[0,0,0],[6,30,1],[8,15,0],[14,20,1],[16,45,0]]}";
+  // char ipayload4[250] = "{\"id\":3,\"pro\":[[0,0,0],[6,30,1],[8,15,0],[14,20,1],[16,45,0]]}";
+  // char ipayload5[250] = "{\"id\":4,\"pro\":[[0,0,0],[6,30,1],[8,15,0],[14,20,1],[16,45,0]]}";  
+  // sched.deseriProg(ipayload1);
+  // sched.deseriProg(ipayload2);
+  // sched.deseriProg(ipayload3);
+  // sched.deseriProg(ipayload4);
+  // sched.deseriProg(ipayload5);
 }
 
 time_t before = 0;
@@ -102,7 +141,7 @@ void loop(){
   Alarm.delay(100);
   server.handleClient();
   if(NEW_MAIL){
-    req.processInc();
+    // req.processInc();
     NEW_MAIL=0;
   }  
   if(!client.connected() && !f.fORCErESET){
@@ -111,30 +150,29 @@ void loop(){
     client.loop();
   }  
   if (f.CKaLARM>0){
-    sched.ckAlarms(); //whatever gets scheduled should publish its update
-    req.pubPrg(f.CKaLARM);
-    req.pubTimr();
-    f.CKaLARM=f.CKaLARM & 0; //11110 turnoff CKaLARM for 1
+    // sched.ckAlarms(); //whatever gets scheduled should publish its update
+    // req.pubPrg(f.CKaLARM);
+    // req.pubFlags();
+    // f.CKaLARM=f.CKaLARM & 0; //11110 turnoff CKaLARM for 1
   }
   inow = millis();
   if(inow-schedcrement > f.cREMENT*1000){
     schedcrement = inow;
     if (f.IStIMERoN >0){
-      sched.updTimers();
-      req.pubTimr();
+      // sched.updTimers();
+      // req.pubTimr();
     }
-    sched.ckRelays();
   }
   if (inow - before > 1000) {
     before = inow;
     if(f.aUTOMA){
-      readTemps();
+      // readTemps();
     }
     if(f.HAYsTATEcNG>0){
-      Serial.print("f.HAYsTATEcNG=");
-      Serial.println(f.HAYsTATEcNG);
+      // Serial.print("f.HAYsTATEcNG=");
+      // Serial.println(f.HAYsTATEcNG);
       //console.log("example console.log entry");
-      req.pubState(f.HAYsTATEcNG);
+      // req.pubState(f.HAYsTATEcNG);
       f.HAYsTATEcNG=0;
     }
   } 

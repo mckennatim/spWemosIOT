@@ -130,6 +130,33 @@ void Sched::setCur(prg_t& p, int &cur, int &nxt){
   }        
 }
 
+void Sched::adjHeat(int id, temp_t& te, int port){
+  int bit =pow(2,id);
+  int mask = 31-bit;  
+  bool relayState = 0;
+  Serial.println(bit);
+  relayState = te.state;
+  if (te.temp >= te.hilimit){
+    relayState=0;
+  } else if (te.temp <= te.lolimit){
+    relayState=1;
+  }
+  if (relayState != te.state){
+    te.state = relayState;
+    int relayon = f.ISrELAYoN;
+    if(te.state){
+      relayon = relayon | bit;
+    }else{
+      relayon = relayon & mask;
+    }
+    if(relayon!=f.ISrELAYoN){
+      f.ISrELAYoN = relayon;
+      req.pubTimr();
+    }
+    digitalWrite(port, relayState); 
+  }   
+}
+
 void Sched::ckAlarms(){
   if((f.CKaLARM & 1) == 1){
     prg_t *p = &prgs.temp1;
@@ -141,6 +168,7 @@ void Sched::ckAlarms(){
     setCur(*p, cur, nxt);
     s->hilimit = p->prg[cur][2];
     s->lolimit = p->prg[cur][3];
+    adjHeat(id, sr.temp1, po.temp1);
     f.HAYsTATEcNG=f.HAYsTATEcNG | bit;
     int asec = second()+id;        
     p->aid = Alarm.alarmOnce(p->prg[nxt][0],p->prg[nxt][1], asec, bm1);
@@ -155,6 +183,7 @@ void Sched::ckAlarms(){
     setCur(*p, cur, nxt);
     s->hilimit = p->prg[cur][2];
     s->lolimit = p->prg[cur][3];
+    adjHeat(id, sr.temp2, po.temp2);
     f.HAYsTATEcNG=f.HAYsTATEcNG | bit;
     int asec = second()+id;        
     p->aid = Alarm.alarmOnce(p->prg[nxt][0],p->prg[nxt][1], asec, bm2);

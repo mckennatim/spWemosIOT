@@ -1,4 +1,6 @@
 # IOT platform apps
+## todo
+Relay is only set when a `readTemp` happens and the temp has changed. Relays also need to be set when a new program resets the hilo limits which happens in `sched:ckAlarms`
 ## setup
 ;dht:humidity temp control for noah's shrooms -dht11+2relays 1 input, 2output
 ;temp: outdoor thermometer -dht11, 1 input
@@ -27,4 +29,6 @@ hardware: First just manually operate the relay by connecting it to a power supp
 
 ## tags
 ### 02-relay_dht_tests
+### 03-adjHeat-onPrgChange
+
 

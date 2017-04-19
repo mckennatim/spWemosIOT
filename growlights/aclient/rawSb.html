@@ -7,7 +7,7 @@
 	<script src="./browserMqtt.js"></script>
 <!-- 	<script src="http://10.0.1.106:1337/vorlon.js"></script>
  -->	<style type="text/css" media="screen">
-		#temp1, #temp2 {
+		#temp1,#temp2 {
 			font-size: 2em;
 		}	
 		span {
@@ -16,11 +16,11 @@
 	</style>	
 </head>
 <body>
-	<h1>read and change devices</h1>
-	device: <input type="text" id="idev" value=CYURD0 size="12"onchange="devChanged()"><br/>
-	<strong>hilo limited devices</strong><br/>
-	sensorId 0: <span  id="temp1"></span> <span id="darr0"></span> <br>
-	sensorId 1: <span  id="temp2"></span> <span id="darr1"></span><br>
+	<h2>Noah's hroom temp/humidity control</h2>
+	device: <input type="text" id="idev" value=CYURD003 size="12"onchange="devChanged()"><br/><br/>
+	Temperature: <span  id="temp1"></span><br>
+	Humidity: <span  id="temp2"></span><br>
+	roof heater on  ? <span id='lue'></span><br>
 	<input type="text" id="srid" value=2 size="1">
 	<input type="text" id="srda" value="[0,0,1]" size="12">
 	<button id="button" onclick="acmd()">a hold</button>
@@ -103,15 +103,14 @@
 			    switch(job){
 			    	case "srstate":
 			    		osrstate[plo.id]=plo.darr;
-
+			    		//console.log(JSON.stringify(osrstate));
+							document.getElementById('lue').innerHTML=plo.heat
 							if (plo.id==0){
 								document.getElementById('temp1').innerHTML=plo.darr[0]
-								document.getElementById('darr0').innerHTML=` [${plo.darr}]`
 							}
 							if (plo.id==1){
 								document.getElementById('temp2').innerHTML=plo.darr[0]
-								document.getElementById('darr1').innerHTML=` [${plo.darr}]`
-							}							
+							}
 							break;
 						case "timr":
 							otimr = plo;
@@ -136,6 +135,7 @@
 				client.publish(req,'{"id":1,"req":"progs"}')
 			});			
 		}
+		devChanged()
 		//var client = mqtt.connect('ws://10.0.1.100:3333')
 		var v1 = document.getElementById("tbox1")
 		var m1 = document.getElementById("mbox1")

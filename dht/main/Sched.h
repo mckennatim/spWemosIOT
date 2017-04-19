@@ -19,6 +19,7 @@ public:
 	void ckAlarms();
 	void actTime();
 	void ckRelays();
+	void adjHeat(int id, temp_t& te, int port);
 private:
 	void deductCrement(int id);
 	void copyProg(prg_t& t, JsonArray& ev);

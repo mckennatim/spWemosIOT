@@ -11,6 +11,9 @@
 #include "Sched.h"
 #include <DHT.h>
 
+#define DHTTYPE DHT11 
+#define DHTPIN 14
+DHT dht(DHTPIN, DHTTYPE);
 
 
 Sched sched;
@@ -27,17 +30,14 @@ state_t sr {{44,0,80,50},{33,0,90,60},{0},{0},{0}};
 ports_t po {5, 16, 15, 13, 12, 4, 14};
 labels_t la; //subsribedTo[], numcmds
 
-// #define ONE_WIRE_BUS po.ds18b20 
-#define DHTTYPE DHT11 
-#define DHTPIN po.io14d5
-DHT dht(DHTPIN, DHTTYPE);
+//#define ONE_WIRE_BUS po.ds18b20 
 
 const char* mqtt_server = "sitebuilt.net";
 const int mport = 1883;
 //const char* mqtt_server = "10.0.1.100";
 
-// OneWire oneWire(ONE_WIRE_BUS);
-// DallasTemperature DS18B20(&oneWire);
+//OneWire oneWire(ONE_WIRE_BUS);
+//DallasTemperature DS18B20(&oneWire);
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -60,25 +60,60 @@ void initShit(){
   digitalWrite(po.timr3, LOW);
 }
 
-//instead of DS18B20 we use DHT reading on pin po.io14d5
+void adjHeat(temp_t& te, bool& rs){
+  rs = te.state;
+  if (te.temp >= te.hilimit){
+    rs=0;
+  } else if (te.temp <= te.lolimit){
+    rs=1;
+  }
+}
+
 void readTemps(){
   int temp1 = (int)(dht.readTemperature(true)+.5);
   int temp2 = (int)dht.readHumidity()+20;
   if(temp1 != sr.temp1.temp && temp1 <120 && temp1>-20){
-    sr.temp1.temp=temp1;
-    int id = 0;
-    int bit =pow(2,id);
+    int bit =pow(2,0);
     int mask = 31-bit;
-    sched.adjHeat(id, sr.temp1, po.temp1);
+    sr.temp1.temp=temp1;
+    bool relaystate;
+    adjHeat(sr.temp1, relaystate);
+    if (relaystate != sr.temp1.state){
+      sr.temp1.state = relaystate;
+      int relayon = f.ISrELAYoN;
+      if(sr.temp1.state){
+        relayon = relayon | bit;
+      }else{
+        relayon = relayon & mask;
+      }
+      if(relayon!=f.ISrELAYoN){
+        f.ISrELAYoN = relayon;
+        req.pubTimr();
+      }
+      digitalWrite(po.temp1, relaystate);
+    }
     f.HAYsTATEcNG=f.HAYsTATEcNG | bit;
   }
   if(temp2 != sr.temp2.temp && temp2 <120 && temp2>-20){
-    sr.temp2.temp=temp2;
-    int id = 1;
-    int bit =pow(2,id);
+    int bit =pow(2,1);
     int mask = 31-bit;
-    sched.adjHeat(id, sr.temp2, po.temp2);
-    f.HAYsTATEcNG=f.HAYsTATEcNG | bit;
+    sr.temp2.temp=temp2;
+    bool relaystate;
+    adjHeat(sr.temp2, relaystate);
+    if (relaystate != sr.temp2.state){
+      sr.temp2.state = relaystate;
+      int relayon = f.ISrELAYoN;
+      if(sr.temp1.state){
+        relayon = relayon | bit;
+      }else{
+        relayon = relayon & mask;
+      }
+      if(relayon!=f.ISrELAYoN){
+        f.ISrELAYoN = relayon;
+        req.pubTimr();      
+      }
+      digitalWrite(po.temp2, relaystate);
+    }
     f.HAYsTATEcNG=f.HAYsTATEcNG | bit;
   }
 }
@@ -95,6 +130,7 @@ void setup(){
   //client.setServer(ip, 1883);
   client.setServer(mqtt_server, mport);
   client.setCallback(handleCallback); //in Req.cpp
+  dht.begin();
   //mq.reconn(client);   
   //req.stime();
 }
@@ -136,8 +172,8 @@ void loop(){
       readTemps();
     }
     if(f.HAYsTATEcNG>0){
-      Serial.print("f.HAYsTATEcNG=");
-      Serial.println(f.HAYsTATEcNG);
+      // Serial.print("f.HAYsTATEcNG=");
+      // Serial.println(f.HAYsTATEcNG);
       //console.log("example console.log entry");
       req.pubState(f.HAYsTATEcNG);
       f.HAYsTATEcNG=0;

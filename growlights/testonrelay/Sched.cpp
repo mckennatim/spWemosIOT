@@ -9,7 +9,6 @@
 extern Reqs req;
 extern flags_t f;
 extern prgs_t prgs;
-extern ports_t po;
 extern state_t sr;
 extern char ipayload[250];
 
@@ -130,33 +129,6 @@ void Sched::setCur(prg_t& p, int &cur, int &nxt){
   }        
 }
 
-void Sched::adjHeat(int id, temp_t& te, int port){
-  int bit =pow(2,id);
-  int mask = 31-bit;  
-  bool relayState = 0;
-  Serial.println(bit);
-  //relayState = te.state;
-  if (te.temp >= te.hilimit){
-    relayState=0;
-  } else if (te.temp <= te.lolimit){
-    relayState=1;
-  }
-  if (relayState != te.state){
-    te.state = relayState;
-    int relayon = f.ISrELAYoN;
-    if(te.state){
-      relayon = relayon | bit;
-    }else{
-      relayon = relayon & mask;
-    }
-    if(relayon!=f.ISrELAYoN){
-      f.ISrELAYoN = relayon;
-      req.pubTimr();
-    }
-    digitalWrite(port, relayState); 
-  }   
-}
-
 void Sched::ckAlarms(){
   if((f.CKaLARM & 1) == 1){
     prg_t *p = &prgs.temp1;
@@ -168,7 +140,6 @@ void Sched::ckAlarms(){
     setCur(*p, cur, nxt);
     s->hilimit = p->prg[cur][2];
     s->lolimit = p->prg[cur][3];
-    adjHeat(id, sr.temp1, po.temp1);
     f.HAYsTATEcNG=f.HAYsTATEcNG | bit;
     int asec = second()+id;        
     p->aid = Alarm.alarmOnce(p->prg[nxt][0],p->prg[nxt][1], asec, bm1);
@@ -183,7 +154,6 @@ void Sched::ckAlarms(){
     setCur(*p, cur, nxt);
     s->hilimit = p->prg[cur][2];
     s->lolimit = p->prg[cur][3];
-    adjHeat(id, sr.temp2, po.temp2);
     f.HAYsTATEcNG=f.HAYsTATEcNG | bit;
     int asec = second()+id;        
     p->aid = Alarm.alarmOnce(p->prg[nxt][0],p->prg[nxt][1], asec, bm2);
@@ -206,16 +176,13 @@ void Sched::ckAlarms(){
       if (nxt != cur){ //don't countdown allday[[0,0,1]]
         setTleft(*p, cur, nxt, tleft);
         f.IStIMERoN = f.IStIMERoN | bit; //shut off in deductCrement
-      }else{ //shutoff timer if program only is a single ev, hold[[0,0,1]]
-        f.IStIMERoN = f.IStIMERoN & mask;
       }
     }else {
-      f.ISrELAYoN = f.ISrELAYoN & mask;       
-      f.IStIMERoN = f.IStIMERoN & mask;
+      f.ISrELAYoN = f.ISrELAYoN & mask;
     }    
     f.tIMElEFT[id]=tleft*60;
     //end of timer specific code
-    f.HAYsTATEcNG=f.HAYsTATEcNG | bit; //turned off in loop
+    f.HAYsTATEcNG=f.HAYsTATEcNG | 4; //turned off in loop
     int asec = second()+id;        
     p->aid = Alarm.alarmOnce(p->prg[nxt][0],p->prg[nxt][1], asec, bm4);
   }
@@ -236,16 +203,13 @@ void Sched::ckAlarms(){
       if (nxt != cur){ //don't countdown allday[[0,0,1]]
         setTleft(*p, cur, nxt, tleft);
         f.IStIMERoN = f.IStIMERoN | bit; //shut off in deductCrement
-      }else{ //shutoff timer if program only is a single ev, hold[[0,0,1]]
-        f.IStIMERoN = f.IStIMERoN & mask;
       }
     }else {
       f.ISrELAYoN = f.ISrELAYoN & mask;
-      f.IStIMERoN = f.IStIMERoN & mask;
     }    
     f.tIMElEFT[id]=tleft*60;
     //end of timer specific code
-    f.HAYsTATEcNG=f.HAYsTATEcNG | bit; //turned off in loop
+    f.HAYsTATEcNG=f.HAYsTATEcNG | 4; //turned off in loop
     int asec = second()+id;        
     p->aid = Alarm.alarmOnce(p->prg[nxt][0],p->prg[nxt][1], asec, bm8);
   }
@@ -265,17 +229,14 @@ void Sched::ckAlarms(){
       f.ISrELAYoN = f.ISrELAYoN | bit;
       if (nxt != cur){ //don't countdown allday[[0,0,1]]
         setTleft(*p, cur, nxt, tleft);
-        f.IStIMERoN = f.IStIMERoN | bit; //on here, shut off in deductCrement
-      }else{ //shutoff timer if program only is a single ev, hold[[0,0,1]]
-        f.IStIMERoN = f.IStIMERoN & mask;
+        f.IStIMERoN = f.IStIMERoN | bit; //shut off in deductCrement
       }
     }else {
       f.ISrELAYoN = f.ISrELAYoN & mask;
-      f.IStIMERoN = f.IStIMERoN & mask;
     }    
     f.tIMElEFT[id]=tleft*60;
     //end of timer specific code
-    f.HAYsTATEcNG=f.HAYsTATEcNG | bit; //turned off in loop
+    f.HAYsTATEcNG=f.HAYsTATEcNG | 4; //turned off in loop
     int asec = second()+id;        
     p->aid = Alarm.alarmOnce(p->prg[nxt][0],p->prg[nxt][1], asec, bm16);
   }
@@ -317,16 +278,4 @@ void Sched::updTimers(){
   }
 }
 
-void Sched::ckRelays(){
-  //temp relays are checked in readTemps()
-  if(sr.timr1.state != digitalRead(po.timr1)){
-    digitalWrite(po.timr1, sr.timr1.state);
-  }
-  if(sr.timr2.state != digitalRead(po.timr2)){
-    digitalWrite(po.timr2, sr.timr2.state);
-  }
-  if(sr.timr3.state != digitalRead(po.timr3)){
-    digitalWrite(po.timr3, sr.timr3.state);
-  }
-}
 
