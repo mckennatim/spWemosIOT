@@ -12,7 +12,6 @@
 #include <DHT.h>
 
 
-
 Sched sched;
 
 prgs_t prgs {
@@ -60,7 +59,6 @@ void initShit(){
   digitalWrite(po.timr3, LOW);
 }
 
-//instead of DS18B20 we use DHT reading on pin po.io14d5
 void readTemps(){
   int temp1 = (int)(dht.readTemperature(true)+.5);
   int temp2 = (int)dht.readHumidity()+20;
@@ -78,7 +76,6 @@ void readTemps(){
     int bit =pow(2,id);
     int mask = 31-bit;
     sched.adjHeat(id, sr.temp2, po.temp2);
-    f.HAYsTATEcNG=f.HAYsTATEcNG | bit;
     f.HAYsTATEcNG=f.HAYsTATEcNG | bit;
   }
 }
@@ -136,8 +133,8 @@ void loop(){
       readTemps();
     }
     if(f.HAYsTATEcNG>0){
-      Serial.print("f.HAYsTATEcNG=");
-      Serial.println(f.HAYsTATEcNG);
+      // Serial.print("f.HAYsTATEcNG=");
+      // Serial.println(f.HAYsTATEcNG);
       //console.log("example console.log entry");
       req.pubState(f.HAYsTATEcNG);
       f.HAYsTATEcNG=0;

@@ -12,6 +12,7 @@ extern labels_t la;
 extern flags_t f;
 extern state_t sr;
 extern prgs_t prgs;
+extern ports_t po;
 
 Reqs::Reqs(char* devid, PubSubClient& client ){
   cdevid = devid;
@@ -47,6 +48,10 @@ void Reqs::processInc(){
 				  f.CKaLARM = 31; 
 				  f.HAYsTATEcNG =31;          
           break;
+        case 1://in cmd
+          deseriCmd();
+          Serial.println(ipayload);
+          break;          
         case 2://in prg
           Serial.println(ipayload);
           sched.deseriProg(ipayload);
@@ -234,3 +239,44 @@ bool Reqs::deseriReq(){
   }  
 }
 
+bool Reqs::deseriCmd(){
+  Serial.println(ipayload);
+  StaticJsonBuffer<1000> jsonBuffer;
+  JsonObject& rot = jsonBuffer.parseObject(ipayload);
+  int id = rot["id"];
+  Serial.print("id = ");
+  Serial.println(id);
+  JsonArray& sra = rot["sra"];
+  switch(id){
+    case 0:
+      copyHiLoState(id, sr.temp1, sra, po.temp1);
+      break;
+    case 1:
+      copyHiLoState(id, sr.temp2, sra, po.temp2);          
+      break;
+    case 2:
+      copyTimrState(id, sr.timr1, sra, po.timr1);          
+      break;
+    case 3:
+      copyTimrState(id, sr.timr2, sra, po.timr2);          
+      break;
+    case 4:
+      copyTimrState(id, sr.timr3, sra, po.timr3);          
+      break;
+    default:
+      Serial.println("in desirCmd default");
+  }  
+}
+
+void Reqs::copyHiLoState(int id, temp_t& t, JsonArray& ev, int port){
+  t.hilimit = ev[0];
+  t.lolimit =ev[1];
+  sched.adjHeat(id, t, port);
+  int bit =pow(2,id);
+  f.HAYsTATEcNG=f.HAYsTATEcNG | bit;
+}
+void Reqs::copyTimrState(int id, timr_t& t, JsonArray& ev, int port){
+  t.state = ev[0];
+  int bit =pow(2,id);
+  f.HAYsTATEcNG=f.HAYsTATEcNG | bit;  
+}

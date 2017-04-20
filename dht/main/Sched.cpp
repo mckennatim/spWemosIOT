@@ -134,8 +134,7 @@ void Sched::adjHeat(int id, temp_t& te, int port){
   int bit =pow(2,id);
   int mask = 31-bit;  
   bool relayState = 0;
-  Serial.println(bit);
-  //relayState = te.state;
+  relayState = te.state;
   if (te.temp >= te.hilimit){
     relayState=0;
   } else if (te.temp <= te.lolimit){

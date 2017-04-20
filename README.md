@@ -30,5 +30,9 @@ hardware: First just manually operate the relay by connecting it to a power supp
 ## tags
 ### 02-relay_dht_tests
 ### 03-adjHeat-onPrgChange
+wipes out days program, puts in a hold. If you want to boost for an hour starting in 30 minutes, then the client would have to grab the days program and insert the boost into it. 
+### 04-adjHeat-onStateChange
+just changes state or hilo for the duration of the current program. Reverts to program control at next program event for that sensor/relay.
+
 
 

@@ -11,7 +11,7 @@
 			font-size: 2em;
 		}	
 		span {
-			font-size: 1.4em;
+			font-size: 1.2em;
 		}	
 	</style>	
 </head>
@@ -19,12 +19,17 @@
 	<h1>read and change devices</h1>
 	device: <input type="text" id="idev" value=CYURD0 size="12"onchange="devChanged()"><br/>
 	<strong>hilo limited devices</strong><br/>
-	sensorId 0: <span  id="temp1"></span> <span id="darr0"></span> <br>
-	sensorId 1: <span  id="temp2"></span> <span id="darr1"></span><br>
-	<input type="text" id="srid" value=2 size="1">
-	<input type="text" id="srda" value="[0,0,1]" size="12">
-	<button id="button" onclick="acmd()">a hold</button>
-	<button id="button" onclick="aprg()">one prog</button><br>
+	sensorId 0: <span  id="temp1"></span> srstate: <span id="darr0"></span> program 0:<br> <span id="prog0"></span> <br>
+	sensorId 1: <span  id="temp2"></span> srstate: <span id="darr1"></span> program 1:<br> <span id="prog1"></span><br>
+	<input type="text" id="prid" value=2 size="1">
+	<input type="text" id="prarr" value="[0,0,1]" size="12">
+	<button id="button" onclick="aprg()">a hold</button> /prg (changes schedule)<br>
+	
+	<input type="text" id="srid" value=0 size="1">
+	<input type="text" id="srarr" value="[84,72]" size="12">
+	<button id="button" onclick="acmd()">a boost</button> /cmd (changes srstate)<br>
+
+	<button id="button" onclick="prg3()">3 random prgs</button><br>
 	<button id="button3" onclick="trigTimeUpd()">trigger time upd</button>
 	<button id="button3" onclick="sendSchedule()">send schedule</button>
 	<button id="button3" onclick="send1Schedule()">send 1 schedule</button><br>
@@ -51,15 +56,20 @@
 		Timer display updates every 
 		<input type="text" id="crement" value=5 size="3" onchange="newCrement()">
 		seconds <br>
-		<button id="button" onclick="uclicked()">toggle aUTOMA</button><br/><br/>
 	for timer 	
 	<input type="text" id="wt" value=1 size="2" > set on/off to 
 	<input type="text" id="onoff" value=0 size="2" >
 	<button id="bonoff" onclick="turnonoff()">turn on/off</button><br>
 
-		<span>Timer 1: </span><span id="timr1"></span><br>
-		<span>Timer 2: </span><span id="timr2"></span><br>
-		<span>Timer 3: </span><span id="timr3"></span><br>
+		<span>Timer 1</span> timeleft: <span id="timr1">0</span> 
+		srstate: <span id="darr2"></span><br>
+		program 2: <span id="prog2"></span><br>
+		<span>Timer 2</span> timeleft: <span id="timr2">0</span> 
+		srstate: <span id="darr3"></span><br>
+		program 3: <span id="prog3"></span><br>
+		<span>Timer 3</span> timeleft: <span id="timr3">0</span> 
+		srstate: <span id="darr4"></span><br>
+		program 4: <span id="prog4"></span><br>
 	</div>
 	<script>
 		var dev = document.getElementById("idev")
@@ -106,12 +116,21 @@
 
 							if (plo.id==0){
 								document.getElementById('temp1').innerHTML=plo.darr[0]
-								document.getElementById('darr0').innerHTML=` [${plo.darr}]`
+								document.getElementById('darr0').innerHTML=JSON.stringify(plo.darr)
 							}
 							if (plo.id==1){
 								document.getElementById('temp2').innerHTML=plo.darr[0]
-								document.getElementById('darr1').innerHTML=` [${plo.darr}]`
+								document.getElementById('darr1').innerHTML=JSON.stringify(plo.darr)
 							}							
+							if (plo.id==2){
+								document.getElementById('darr2').innerHTML=plo.darr[0]
+							}
+							if (plo.id==3){
+								document.getElementById('darr3').innerHTML=plo.darr[0]
+							}
+							if (plo.id==4){
+								document.getElementById('darr4').innerHTML=plo.darr[0]
+							}
 							break;
 						case "timr":
 							otimr = plo;
@@ -121,8 +140,21 @@
 							document.getElementById('timr3').innerHTML=plo.tIMElEFT[4]
 							break;
 						case "sched":
-							oprogs[plo.id]=plo;
-							//console.log(JSON.stringify(oprogs))
+							if (plo.id==0){
+								document.getElementById('prog0').innerHTML=JSON.stringify(plo.pro)
+							}
+							if (plo.id==1){
+								document.getElementById('prog1').innerHTML=JSON.stringify(plo.pro)
+							}
+							if (plo.id==2){
+								document.getElementById('prog2').innerHTML=JSON.stringify(plo.pro)
+							}
+							if (plo.id==3){
+								document.getElementById('prog3').innerHTML=JSON.stringify(plo.pro)
+							}
+							if (plo.id==4){
+								document.getElementById('prog4').innerHTML=JSON.stringify(plo.pro)
+							}
 							break;
 						case "flags":
 							oflags = plo;
@@ -146,22 +178,25 @@
 		var wt = document.getElementById("wt")
 		var onof = document.getElementById("onoff")
 		var srid = document.getElementById("srid")
-		var srda = document.getElementById("srda")
+		var srarr = document.getElementById("srarr")
+		var prid = document.getElementById("prid")
+		var prarr = document.getElementById("prarr")
 		var dreq = document.getElementById("req")
 		var crement=10;
-		//console.log(v.value)
+		
+		//TOGGLE AUTOMA
+		// var onoff = 1
+		// function uclicked(){
+		// 	//document.getElementById('lue').innerHTML=onoff
+		// 	onoff=!onoff;
+		// 	var thecmd =  "{\"heat\":"+onoff*1+",\"auto\":1,\"hilimit\":80,\"lolimit\":74,\"empty\":0}"
+		// 	console.log(thecmd);
+		// 	client.publish(cmd, thecmd)
+		// }
 
-		var onoff = 1
-		function uclicked(){
-			//document.getElementById('lue').innerHTML=onoff
-			onoff=!onoff;
-			var thecmd =  "{\"heat\":"+onoff*1+",\"auto\":1,\"hilimit\":80,\"lolimit\":74,\"empty\":0}"
-			console.log(thecmd);
-			client.publish(cmd, thecmd)
-		}
-		function acmd(){
-			var id =srid.value
-			var str = srda.value
+		function aprg(){
+			var id =prid.value
+			var str = prarr.value
 			var arr = str.slice(1,-1).split(',').map(function(e){return parseInt(e)})
 			var thecmd =  `{\"id\":${id}`
 			var sl = str.length
@@ -170,7 +205,18 @@
 			console.log(thecmd);
 			client.publish(prg, thecmd)
 		}
-		function aprg(){
+		function acmd(){
+			var id =srid.value
+			var str = srarr.value
+			var arr = str.slice(1,-1).split(',').map(function(e){return parseInt(e)})
+			var thecmd =  `{\"id\":${id}`
+			var sl = str.length
+			thecmd+=`,\"sra\":${str}}`
+			console.log(str)
+			console.log(thecmd);
+			client.publish(cmd, thecmd)
+		}
+		function prg3(){
 			var thecmd =  `{\"id\":0,\"pro\":[[0,0,84,82],[6,30,80,79]]}`	
 			var thecmd2 =  `{\"id\":1,\"pro\":[[0,0,79,77],[6,30,78,77]]}`	
 			var thecmd3 =  `{\"id\":2,\"pro\":[[0,0,0],[6,30,1]]}`	

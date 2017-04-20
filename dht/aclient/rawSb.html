@@ -19,8 +19,8 @@
 	<h1>read and change devices</h1>
 	device: <input type="text" id="idev" value=CYURD0 size="12"onchange="devChanged()"><br/>
 	<strong>hilo limited devices</strong><br/>
-	sensorId 0: <span  id="temp1"></span> <span id="darr0"></span> <br>
-	sensorId 1: <span  id="temp2"></span> <span id="darr1"></span><br>
+	sensorId 0: <span  id="temp1"></span> <span id="prog0"></span> <br>
+	sensorId 1: <span  id="temp2"></span> <span id="prog1"></span><br>
 	<input type="text" id="srid" value=2 size="1">
 	<input type="text" id="srda" value="[0,0,1]" size="12">
 	<button id="button" onclick="acmd()">a hold</button>
@@ -106,11 +106,9 @@
 
 							if (plo.id==0){
 								document.getElementById('temp1').innerHTML=plo.darr[0]
-								document.getElementById('darr0').innerHTML=` [${plo.darr}]`
 							}
 							if (plo.id==1){
 								document.getElementById('temp2').innerHTML=plo.darr[0]
-								document.getElementById('darr1').innerHTML=` [${plo.darr}]`
 							}							
 							break;
 						case "timr":
@@ -122,8 +120,15 @@
 							break;
 						case "sched":
 							oprogs[plo.id]=plo;
-							//console.log(JSON.stringify(oprogs))
-							break;
+							console.log('sched coming in')
+							console.log(plo.pro)
+							if (plo.id==0){
+								document.getElementById('prog0').innerHTML=` [${plo.pro}]`
+							}
+							if (plo.id==1){
+								document.getElementById('prog1').innerHTML=` [${plo.pro}]`
+							}
+							break
 						case "flags":
 							oflags = plo;
 							//console.log(JSON.stringify(oflags))
