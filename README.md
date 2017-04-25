@@ -1,12 +1,13 @@
 # IOT platform apps
 ## todo
-Relay is only set when a `readTemp` happens and the temp has changed. Relays also need to be set when a new program resets the hilo limits which happens in `sched:ckAlarms`
+
 ## setup
-;dht:humidity temp control for noah's shrooms -dht11+2relays 1 input, 2output
-;temp: outdoor thermometer -dht11, 1 input
-;hrc: heated roof control-1 relay, 2inputs, 1output
-;timerrelay: timer for plants 1relay 1 output
-;irrig12v: water valve 1timer output (moisture level input)
+* CYURD001 original test board 2 ds1820b on input(io4d2), relay on temp1(io5d1)
+* CYURDOO3 dht:humidity temp control for noah's shrooms -dht11+2relays 1 input, 2output
+* temp: outdoor thermometer -dht11, 1 input
+* CYURDOO5 hrc: heated roof control-1 relay, 2inputs, 1output
+* CYURD004 timerrelay: timer for plants 1relay 1 output DHT11 input io14d5
+* irrig12v: water valve 1timer output (moisture level input)
 
 * ^ bundle components into 4 sets
 * ^ solder connectors on wemos
@@ -28,7 +29,9 @@ hardware: First just manually operate the relay by connecting it to a power supp
 * read DHT from `io14d5` send it out with temp->temp1 and humidity->temp2
 
 ## tags
+### 05-wifimanager
 ### 02-relay_dht_tests
+Relay is only set when a `readTemp` happens and the temp has changed. Relays also need to be set when a new program resets the hilo limits which happens in `sched:ckAlarms`
 ### 03-adjHeat-onPrgChange
 wipes out days program, puts in a hold. If you want to boost for an hour starting in 30 minutes, then the client would have to grab the days program and insert the boost into it. 
 ### 04-adjHeat-onStateChange

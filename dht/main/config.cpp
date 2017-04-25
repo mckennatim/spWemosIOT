@@ -11,9 +11,10 @@ char *espssid = "espAPsb";
 char ssid[40];
 char pwd[24];
 char devid[9];
+char dpwd[24];
 char ip[16];
 char port[5];
-char ssids[500];
+char ssids[600];
 uint8_t idx[5];
 bool NEEDS_RESET = 0;
 

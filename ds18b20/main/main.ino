@@ -27,7 +27,7 @@ labels_t la; //subsribedTo[], numcmds
 
 #define ONE_WIRE_BUS po.ds18b20 
 
-const char* mqtt_server = "sitebuilt.net";
+//const char* mqtt_server = "sitebuilt.net";
 const int mport = 1883;
 //const char* mqtt_server = "10.0.1.100";
 
@@ -99,7 +99,7 @@ time_t inow;
 
 void loop(){
   Alarm.delay(100);
-  server.handleClient();
+  //server.handleClient();
   if(NEW_MAIL){
     req.processInc();
     NEW_MAIL=0;
