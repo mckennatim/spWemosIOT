@@ -2,11 +2,11 @@
 ## todo
 
 ## setup
-* CYURD001 original test board 2 ds1820b on input(io4d2), relay on temp1(io5d1)
+* CYURD001 ds1820b: original test board 2 ds1820b on input(io4d2), relay on temp1(io5d1)
 * CYURDOO3 dht:humidity temp control for noah's shrooms -dht11+2relays 1 input, 2output
-* temp: outdoor thermometer -dht11, 1 input
-* CYURDOO5 hrc: heated roof control-1 relay, 2inputs, 1output
-* CYURD004 timerrelay: timer for plants 1relay 1 output DHT11 input io14d5
+* CYURDOO6 ds1820b temp: outdoor thermometer -ds1820b, 1 input
+* CYURDOO5 either hrc: heated roof control-1 relay, 2inputs, 1output
+* CYURD004 dht  timerrelay: timer for plants 1relay 1 output DHT11 input io14d5
 * irrig12v: water valve 1timer output (moisture level input)
 
 * ^ bundle components into 4 sets
@@ -24,8 +24,9 @@ to do that and `blank/aclient/rawSb.html`'s 'turnOnOff()' accomplishes that for 
 
 hardware: First just manually operate the relay by connecting it to a power supply. Relays work when input us given a path to ground. They need to be driven by a transistor and protected by a diode. Mock up that circuit to check it. 
 #### dht test
+* http://randomnerdtutorials.com/esp8266-dht11dht22-temperature-and-humidity-web-server-with-arduino-ide/ download from here
 * duplicate blank as dht
-* `sketch/include libraries/manage libraries` and search for dht. Install.
+* `sketch/include libraries/manage libraries` and search for dht. Install. and install adafruit unified sensor
 * read DHT from `io14d5` send it out with temp->temp1 and humidity->temp2
 
 ## tags
@@ -37,5 +38,6 @@ wipes out days program, puts in a hold. If you want to boost for an hour startin
 ### 04-adjHeat-onStateChange
 just changes state or hilo for the duration of the current program. Reverts to program control at next program event for that sensor/relay.
 
-
+![drawings1](zimg/wemosIOT.jpg)
+![drawings2](zimg/wemosIOT2.jpg)
 
