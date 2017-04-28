@@ -61,6 +61,9 @@ void readTemps(){
   if(strcmp(sensor_type, "dht")==0){
     temp1 = (int)(dht.readTemperature(true)+.5);
     temp2 = (int)dht.readHumidity()+20;
+  } else if(strcmp(sensor_type, "hrc")==0){
+    temp1 =  digitalRead(po.ds18b20); 
+    temp2 =  digitalRead(po.io14d5); 
   } else {
     DS18B20.requestTemperatures(); 
     temp1 = (int)DS18B20.getTempFByIndex(0);

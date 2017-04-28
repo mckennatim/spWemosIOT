@@ -30,6 +30,7 @@ hardware: First just manually operate the relay by connecting it to a power supp
 * read DHT from `io14d5` send it out with temp->temp1 and humidity->temp2
 
 ## tags
+### 06-sensor_type-hrc
 ### 05-wifimanager
 ### 02-relay_dht_tests
 Relay is only set when a `readTemp` happens and the temp has changed. Relays also need to be set when a new program resets the hilo limits which happens in `sched:ckAlarms`
