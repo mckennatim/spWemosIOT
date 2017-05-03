@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">	
+	<title>webmqtt</title>
+	<script src="./mqttws31.js"></script>
+	</head>
+<body>
+	<h1>iphone ws test</h1>
+	<button id="ib" onclick="connect()">connect</button>
+	<button id="ib" onclick="subscribe()">subscribe</button>
+	<div id="data"></div>
+	<script>
+		var data = document.getElementById("data")
+		var client
+		function connect() {
+			client.connect({onSuccess:onConnect});
+		}
+		function subscribe() {
+			client.subscribe("CYURD007/srstate")
+			client.subscribe("CYURD007/flags")
+			client.subscribe("CYURD007/timr")
+		}
+
+		client = new Paho.MQTT.Client("10.0.1.101", 3333, "W101");
+		client.onConnectionLost = onConnectionLost;
+		client.onMessageArrived = onMessageArrived;
+
+		function onConnect() {
+				console.log('Connected to Sitebuilt.net:3333!');
+		}
+		function onConnectionLost(responseObject) {
+				if (responseObject.errorCode !== 0) {
+					console.log('Connection Lost ' + responseObject.errorMessage);
+				}
+		}	
+		function onMessageArrived(message) {
+			console.log(message.destinationName+ message.payloadString)
+			data.innerHTML += message.destinationName+ message.payloadString+"<br>"
+		}		
+		client.onConnectionLost = onConnectionLost;
+		client.onMessageArrived = onMessageArrived;			
+	</script>
+</body>
+</html>

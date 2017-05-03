@@ -30,6 +30,21 @@ hardware: First just manually operate the relay by connecting it to a power supp
 * read DHT from `io14d5` send it out with temp->temp1 and humidity->temp2
 
 ## tags
+### 07-paho-lightsoff-hrs
+
+switch to Paho's `mqttws31.js`
+
+changed `etc/nginx/sites-available/services` to
+`
+      location /geniot/ws:3333 {
+         proxy_pass http://localhost:3333;
+
+        function connect() {
+            client.connect({onSuccess:onConnect, useSSL:true});
+        }
+    client = new Paho.MQTT.Client("services.sitebuilt.net/geniot/ws", 3333, "pahoSB"+Math.random()*1000000);
+
+`
 ### 06-sensor_type-hrc
 ### 05-wifimanager
 ### 02-relay_dht_tests
