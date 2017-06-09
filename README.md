@@ -1,4 +1,19 @@
 # IOT platform apps
+https://github.com/knolleary/pubsubclient
+
+## tags
+## 09-auth-MQclient_reconn-cfgsimple
+Now device authenticates using real config.cpp owner and pwd. Config from data/config.json gets sent to device from ArduinoIDE Tools/ESP8266_Sketch_data_upload (with terminal closed) any time you want. 
+
+wifiManager just needs ssid and ssidpwd all other config comes from data/config.json.
+## 08-auth
+add userName and password Authentication shell to both spWemosIOT/auth/main/Mqclient.cpp and to oahoRaw.html as long as userName="tom@sitebuilt.net" and password='freddy'. 
+
+So from clentId, uesrName and password we need to know whatrs up
+Username should be device.owner for device and user for client.
+
+Details...
+
 ## todo
 
 ## setup

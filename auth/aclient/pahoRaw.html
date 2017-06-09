@@ -109,11 +109,22 @@
     		console.log(err)
     	}
     }
-
+    /*SSL version*/
+    // function connect() {
+    //     client.connect({
+    //         onSuccess: onConnect,
+    //         useSSL: true,
+    //         userName: 'tim@sitebuilt.net',
+    //         password: 'freddy'
+    //     });
+    // }
+    
+    /*ws version*/
     function connect() {
         client.connect({
             onSuccess: onConnect,
-            useSSL: true
+            userName: 'tim@sitebuilt.net',
+            password: 'freddy'
         });
     }
 
@@ -125,7 +136,8 @@
         client.subscribe(flags)
     }
 
-    client = new Paho.MQTT.Client("services.sitebuilt.net/geniot/ws", 3333, "pahoSB" + Math.random() * 1000000);
+    //client = new Paho.MQTT.Client("services.sitebuilt.net/geniot/ws", 3333, "CLpahoSB" + Math.random() * 1000000);
+    client = new Paho.MQTT.Client("10.0.1.102", 3333, "CLpahoRawLo" + Math.random() * 1000000);
     client.onConnectionLost = onConnectionLost;
     client.onMessageArrived = onMessageArrived;
 

@@ -71,7 +71,11 @@
     }
 
 		function connect() {
-			client.connect({onSuccess:onConnect, useSSL:true});
+			client.connect({onSuccess:onConnect, 
+											useSSL:true,
+											userName: 'tim@sitebuilt.net',
+											password: 'freddy'
+										});
 		}
 		function subscribe() {
 			client.subscribe(devtime)//device time
