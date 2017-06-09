@@ -5,7 +5,7 @@
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 #include <DHT.h>
-#include "config.h" //getOnline() devid
+#include "config.h" //getOnline() devid owner pwd
 #include "STATE.h"
 #include "MQclient.h" //globals(extern) NEW_MAIL, itopic, ipayload + Console + handleCallback()
 #include "Reqs.h"
@@ -115,6 +115,7 @@ void loop(){
   //server.handleClient();
   if(NEW_MAIL){
     req.processInc();
+    //Serial.println("hay NEW_MAIL");
     NEW_MAIL=0;
   }  
   if(!client.connected() && !f.fORCErESET){

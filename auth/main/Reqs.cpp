@@ -4,6 +4,7 @@
 #include "Sched.h"
 #include <Arduino.h>
 #include <TimeLib.h>
+#include "config.h" //getOnline() readConfig()devid owner pwd
 
 extern Sched sched;
 extern char itopic[40];
@@ -59,6 +60,11 @@ void Reqs::processInc(){
         case 3://in req
           Serial.println(ipayload);
           deseriReq();
+          break;          
+        case 4://in set
+          Serial.println("in set");
+          Serial.println(ipayload);
+          reconfig(ipayload);
           break;          
         case 5:
           Serial.println("in progs(deprecated)");

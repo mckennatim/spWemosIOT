@@ -15,6 +15,10 @@ char mqtt_server[60];
 char mqtt_port[6];
 char sensor_type[24];
 
+void reconfig(char pload[]){
+  Serial.println(pload);
+}
+
 void readConfig(){
   //clean FS, for testing
   //SPIFFS.format();  
@@ -56,19 +60,12 @@ void readConfig(){
 
 void getOnline(){
   readConfig();
-  // The extra parameters to be configured (can be either global or just in the setup)
-  // After connecting, parameter.getValue() will get you the configured value
-  // id/name placeholder/prompt default length
-  //WiFiManager
   //Local intialization. Once its business is done, there is no need to keep it around
   WiFiManager wifiManager;
-
   //reset settings - for testing
   //wifiManager.resetSettings();
-
   //fetches ssid and pass and tries to connect
   //if it does not connect it starts an access point with the specified name
-  //here  "AutoConnectAP"
   //and goes into a blocking loop awaiting configuration
   if (!wifiManager.autoConnect("connectEspAP")) {
     Serial.println("failed to connect and hit timeout");

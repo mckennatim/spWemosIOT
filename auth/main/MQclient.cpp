@@ -4,7 +4,7 @@
 #include "STATE.h"
 
 char itopic[40];
-char ipayload[250];
+char ipayload[256];
 bool NEW_MAIL=0;
 extern labels_t la;
 
@@ -59,6 +59,8 @@ void MQclient::reconn(PubSubClient& client) {
 
 void handleCallback(char* topic, byte* payload, unsigned int length){
   int b = 15;
+  Serial.print("Payload size is ");
+  Serial.println(length);
   for (int i=0;i<strlen(topic);i++) {
     itopic[i] = topic[i];
     if (topic[i] == '/'){b = i;}

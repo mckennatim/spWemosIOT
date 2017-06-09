@@ -12,5 +12,7 @@
 
 	extern bool NEEDS_RESET;
 	void getOnline();
+	void readConfig();
+	void reconfig(char pload[]);
 
 #endif

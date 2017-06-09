@@ -46,6 +46,7 @@
     </select>
     <br>
     <button id="button3" onclick="sendSchedule()">send schedule</button>
+    <button id="buttonReset" onclick="resetConfig()">(re)set reconfig</button>
     <br> with timer1 starting in
     <input type="text" id="mbox1" value=0 size="2" onchange="mchanged()"> min and going for
     <input type="text" id="tbox1" value=1 size="2" onchange="vchanged()">minutes
@@ -77,7 +78,7 @@
     <script>
     var dev = document.getElementById("idev")
         //const deviceId ='CYURD002'
-    var tmr, progs, cmd, prg, req, trigtime, devtime, sched, client;
+    var tmr, progs, cmd, prg, set, req, trigtime, devtime, sched, client;
     var oflags = {}
     var osrstate = [];
     var oprogs = []
@@ -118,7 +119,7 @@
     //         password: 'freddy'
     //     });
     // }
-    
+
     /*ws version*/
     function connect() {
         client.connect({
@@ -241,6 +242,7 @@
         flags = deviceId + '/flags'
             //deprecate
         timr = deviceId + '/timr'
+        set = deviceId + '/set'
             // progs = deviceId+'/progs'
         connect()
     }
@@ -294,6 +296,13 @@
         console.log(thecmd);
         console.log(trigtime);
         publish(trigtime, thecmd)
+    }
+    function resetConfig() {
+        var thecmd = '{"devid":"CYURD007", "owner":"tim@sitebuilt.net", "pwd":"freddy", "mqtt_server":"10.0.1.102", "mqtt_port":"1883", "sensor_type":""}'
+        //var thecmd = '{"devid":"CYURD007", "owner":"tim@sitebuilt.net", "pwd":"freddy", "mqtt_port":"1883"}'//, "mqtt_server":"10.0.1.102", "mqtt_port":"1883", "sensor_type":""}'
+        console.log(thecmd);
+        var cmdd='{"id":2,"req":"flags"}'
+        publish(set, thecmd)
     }
 
     function newCrement() {
