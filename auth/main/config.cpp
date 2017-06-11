@@ -17,6 +17,42 @@ char sensor_type[24];
 
 void reconfig(char pload[]){
   Serial.println(pload);
+  StaticJsonBuffer<500> jsonBuffer;
+  JsonObject& json = jsonBuffer.parseObject(pload);
+  json.printTo(Serial);
+  if (json.success()) {
+    Serial.println("\nparsed json");
+
+    strcpy(devid, json["devid"]);
+    strcpy(owner, json["owner"]);
+    strcpy(pwd, json["pwd"]);
+    strcpy(mqtt_server, json["mqtt_server"]);
+    strcpy(mqtt_port, json["mqtt_port"]);
+    strcpy(sensor_type, json["sensor_type"]);
+  } else {
+    Serial.println("failed to load json config");
+  }  
+}
+
+void saveConfig(){
+  Serial.println("saving config");
+  //DynamicJsonBuffer jsonBuffer;
+  StaticJsonBuffer<196> jsonBuffer;
+  JsonObject& json = jsonBuffer.createObject();
+  json["devid"] = devid;
+  json["owner"] = owner;
+  json["pwd"] = pwd;
+  json["mqtt_server"] = mqtt_server;
+  json["mqtt_port"] = mqtt_port;
+  json["sensor_type"] = sensor_type;
+  Serial.println(jsonBuffer.size());
+  File configFile = SPIFFS.open("/config.json", "w");
+  if (!configFile) {
+    Serial.println("failed to open config file for writing");
+  }
+  json.printTo(Serial);
+  json.printTo(configFile);
+  configFile.close();   
 }
 
 void readConfig(){
@@ -35,22 +71,23 @@ void readConfig(){
         std::unique_ptr<char[]> buf(new char[size]);
 
         configFile.readBytes(buf.get(), size);
-        //DynamicJsonBuffer jsonBuffer;
-        StaticJsonBuffer<500> jsonBuffer;
-        JsonObject& json = jsonBuffer.parseObject(buf.get());
-        json.printTo(Serial);
-        if (json.success()) {
-          Serial.println("\nparsed json");
+        reconfig(buf.get());
+        // //DynamicJsonBuffer jsonBuffer;
+        // StaticJsonBuffer<500> jsonBuffer;
+        // JsonObject& json = jsonBuffer.parseObject(buf.get());
+        // json.printTo(Serial);
+        // if (json.success()) {
+        //   Serial.println("\nparsed json");
 
-          strcpy(devid, json["devid"]);
-          strcpy(owner, json["owner"]);
-          strcpy(pwd, json["pwd"]);
-          strcpy(mqtt_server, json["mqtt_server"]);
-          strcpy(mqtt_port, json["mqtt_port"]);
-          strcpy(sensor_type, json["sensor_type"]);
-        } else {
-          Serial.println("failed to load json config");
-        }
+        //   strcpy(devid, json["devid"]);
+        //   strcpy(owner, json["owner"]);
+        //   strcpy(pwd, json["pwd"]);
+        //   strcpy(mqtt_server, json["mqtt_server"]);
+        //   strcpy(mqtt_port, json["mqtt_port"]);
+        //   strcpy(sensor_type, json["sensor_type"]);
+        // } else {
+        //   Serial.println("failed to load json config");
+        // }
       }
     }
   } else {

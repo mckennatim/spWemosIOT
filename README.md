@@ -2,6 +2,8 @@
 https://github.com/knolleary/pubsubclient
 
 ## tags
+## 10-auth-remote-change-cfg-over-mqtt
+processIncoming set
 ## 09-auth-MQclient_reconn-cfgsimple
 Now device authenticates using real config.cpp owner and pwd. Config from data/config.json gets sent to device from ArduinoIDE Tools/ESP8266_Sketch_data_upload (with terminal closed) any time you want. 
 

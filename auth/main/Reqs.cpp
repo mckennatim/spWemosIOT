@@ -63,8 +63,13 @@ void Reqs::processInc(){
           break;          
         case 4://in set
           Serial.println("in set");
-          Serial.println(ipayload);
+          //Serial.println(ipayload);
           reconfig(ipayload);
+          delay(2000);
+          saveConfig();
+          delay(2000);
+          //reset and try again, or maybe put it to deep sleep
+          ESP.reset();
           break;          
         case 5:
           Serial.println("in progs(deprecated)");
