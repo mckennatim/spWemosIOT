@@ -1,8 +1,8 @@
 {
-	"devid":"CYURD007",
+	"devid":"CYURD001",
 	"owner":"tim@sitebuilt.net",
-	"pwd":"freddy",
-	"mqtt_server":"10.0.1.102",
+	"pwd":"geniot",
+	"mqtt_server":"10.0.1.105",
 	"mqtt_port":"1883",
 	"sensor_type":""
 }

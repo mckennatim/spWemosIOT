@@ -2,6 +2,8 @@
 https://github.com/knolleary/pubsubclient
 
 ## tags
+## 11-dailyAlarm-getTime
+In another defeat of catch 22:), on setup() set a `Alarm.timerOnce(10,  dailyAlarm` which sets up a daily alarm that runs `(10*((int)devid[6]-'0')+(int)devid[7]-'0')%16` minutes after midnight to send a devid/time request to IOTbroker.
 ## 10-auth-remote-change-cfg-over-mqtt
 processIncoming set
 ## 09-auth-MQclient_reconn-cfgsimple
