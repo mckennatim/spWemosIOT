@@ -31,7 +31,7 @@ labels_t la; //subsribedTo[], numcmds
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature DS18B20(&oneWire);
 
-#define DHTTYPE DHT11 
+#define DHTTYPE DHT22 
 #define DHTPIN po.io14d5
 DHT dht(DHTPIN, DHTTYPE);
 

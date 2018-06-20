@@ -3,7 +3,7 @@ https://github.com/knolleary/pubsubclient
 
 ## tags
 ## 13-api2a-astra-sched-overflow
-
+So using CYURD001 and CYURD003 to test hvac react app. For the time being, limiting schedule to 5 events.(in hvac react) api2a is broken causing some kind of fault on all the memory allocations that I went and messed with, astral and JsonBuffer and ipayload et all. Meanwhile in order to get the old api2 main.ino code to work line 34 need to change from DHT11 to DHT22. Also the config file need to have sensor_type='dht'
 ## 12-timr.rec-hayChange
 switched listening for state change of timers from ckAlarms to ckRelays to have more consistent reporting of state change.
 ## 11-dailyAlarm-getTime

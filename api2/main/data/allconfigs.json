@@ -14,3 +14,19 @@
 	"mqtt_port":"1883",
 	"sensor_type":""
 }
+{
+	"devid":"CYURD003",
+	"owner":"tim@sitebuilt.net",
+	"pwd":"geniot",
+	"mqtt_server":"10.0.1.100",
+	"mqtt_port":"1883",
+	"sensor_type":"dht"
+}
+{
+	"devid":"CYURD003",
+	"owner":"tim@sitebuilt.net",
+	"pwd":"geniot",
+	"mqtt_server":"sitebuilt.net",
+	"mqtt_port":"1884",
+	"sensor_type":"dht"
+}
